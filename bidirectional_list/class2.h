@@ -22,7 +22,7 @@ public:
 
 	void swap(int index1 = 0, int index2 = 0); // поменять местами значения в списке +
 
-	void delete_first(); // удаление первого элемента
+	void delete_first(); // удаление первого элемента +
 	void delete_last(); // удаление последнего элемента
 	void delete_by_index(int index = 0); // удаление по индексу
 	void delete_all(); // удаление всех элементов списка
@@ -260,4 +260,20 @@ void List2<T>::swap(int index1, int index2)
 	index_value(index1) = index_value(index2);
 	index_value(index2) = current;
 };
+
+template <class T> // удаление первого элемента
+void List2<T>::delete_first() 
+{
+	if (head == nullptr) 
+	{ // если список пуст
+		cout << "error" << endl;
+		return;
+	}
+
+	Node<T>* delete_element = head;
+	head = head->next;
+	head->previos = nullptr;
+	delete delete_element;
+	Size--;
+}
 
