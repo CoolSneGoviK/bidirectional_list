@@ -20,7 +20,7 @@ public:
 	void show_start_end(); // вывод всех элементов списка с head (с головы) +
 	void show_end_start(); // вывод всех элементов списка с tail (с хвоста) +
 
-	void swap(int index1 = 0, int index2 = 0); // поменять местами значения в списке
+	void swap(int index1 = 0, int index2 = 0); // поменять местами значения в списке +
 
 	void delete_first(); // удаление первого элемента
 	void delete_last(); // удаление последнего элемента
@@ -141,6 +141,11 @@ T& List2<T>::index_value(int index)
 		return head->data;
 	}
 
+	if (index == Size - 1) 
+	{
+		return tail->data;
+	}
+
 	if (index > Size -1) 
 	{
 		cout << "error" << endl;
@@ -169,6 +174,11 @@ T& List2<T>::operator[](int index)
 	if (index == 0)
 	{
 		return head->data;
+	}
+
+	if (index == Size - 1)
+	{
+		return tail->data;
 	}
 
 	if (index > Size - 1)
@@ -231,4 +241,23 @@ void List2<T>::show_end_start()
 	}
 }
 
+template <class T> // меняет местами значения в списке 
+void List2<T>::swap(int index1, int index2)
+{
+	if (index1 < 0 || index2 < 0) 
+	{
+		cout << "error" << endl;
+		return;
+	}
+
+	if (index1 > (Size - 1) || index2 > (Size - 1) )
+	{
+		cout << "error" << endl;
+		return;
+	}
+	
+	T current = index_value(index1);
+	index_value(index1) = index_value(index2);
+	index_value(index2) = current;
+};
 
