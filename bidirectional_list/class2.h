@@ -8,7 +8,7 @@ class List2
 {
 public:
 	List2() {};
-	~List2() {};
+	~List2() { delete_all(); };
 
 	void add_element(T data = T()); // добавление в конец +
 	void add_start(T data = T()); // добавление в начало +
@@ -23,11 +23,11 @@ public:
 	void swap(int index1 = 0, int index2 = 0); // помен€ть местами значени€ в списке +
 
 	void delete_first(); // удаление первого элемента +
-	void delete_last(); // удаление последнего элемента
-	void delete_by_index(int index = 0); // удаление по индексу
-	void delete_all(); // удаление всех элементов списка
+	void delete_last(); // удаление последнего элемента +
+	void delete_by_index(int index = 0); // удаление по индексу +
+	void delete_all(); // удаление всех элементов списка +
 
-	int get_Size() { return Size; }; // дл€ получени€ колличества элементов
+	int get_Size() { return Size; }; // дл€ получени€ колличества элементов +
 
 private:
 	template <class T>
@@ -63,9 +63,25 @@ void List2<T>::add_element(T data)
 		return;
 	}
 
+	// это новое решение, что бы не проходить по всему списку каждый раз, добавл€ем сразу в конец с помощью tail, работает
+	if (tail == nullptr) 
+	{ // значит в списке 1 элемент хран€щийс€ в head
+		tail = new Node<T>(data, head, nullptr);
+		head->next = tail;
+		Size++;
+		return;
+	}
+
+	Node<T>* last = new Node<T>(data, tail, nullptr);
+	tail->next = last;
+	tail = last;
+	Size++;
+
+	// эта верси€ работает, но попробую подругому
+	/* 
 	Node<T>* current = head;
 	while (head) 
-	{ // если не пуст // добавить приравнивание последнего элемент а tail и с указател€ми пон€ть что как
+	{ // если список не пуст
 		if (head->next == nullptr)
 		{
 			tail = new Node<T>(data, head, nullptr);
@@ -76,6 +92,7 @@ void List2<T>::add_element(T data)
 		}
 		head = head->next;
 	}
+	*/
 }
 
 template <class T> // добавление элемента списка в начало
@@ -206,6 +223,12 @@ T& List2<T>::operator[](int index)
 template <class T> // вывод элементов с head
 void List2<T>::show_start_end()
 {
+	if (Size == 0)
+	{
+		cout << "list is empty" << endl;
+		return;
+	}
+
 	Node<T>* current = head;
 	while (head) 
 	{
@@ -225,6 +248,12 @@ void List2<T>::show_start_end()
 template <class T> // вывод элементов с tail
 void List2<T>::show_end_start() 
 {
+	if (Size == 0) 
+	{
+		cout << "list is empty" << endl;
+		return;
+	}
+
 	Node<T>* current = tail;
 	while (tail) 
 	{
@@ -262,18 +291,90 @@ void List2<T>::swap(int index1, int index2)
 };
 
 template <class T> // удаление первого элемента
-void List2<T>::delete_first() 
-{
-	if (head == nullptr) 
+void List2<T>::delete_first()
+{ // как работает с head и tail когда например 2 элемента в списке, проверить на правильность нужно.
+	if (head == nullptr)
 	{ // если список пуст
+		cout << "error - list is empty" << endl;
+		return;
+	}
+
+	if (head == tail) 
+	{
+		Node<T>* delete_element = head;
+		tail = nullptr;
+		head = nullptr;
+		delete delete_element;
+		Size--;
+		return;
+	}
+
+	Node<T>* delete_element = head; // присваиваем head указателю, что бы в дальнейшем удалить 1 элемент 
+	head = head->next; // head присваиваем следующий элемент в списке
+	head->previos = nullptr; // теперь этот элемент первый и перед ним ничего нет
+	delete delete_element; // удалили 1 элемент
+	Size--;
+};
+
+template <class T>
+void List2<T>::delete_last() 
+{
+	Node<T>* last = tail;
+	tail = tail->previos;
+	tail->next = nullptr;
+	delete last;
+	Size--;
+}
+
+template <class T>
+void List2<T>::delete_by_index(int index)
+{
+	if (index == (Size-1))
+	{ // если индекс указывает на последний элемент
+		delete_last();
+		return;
+	}
+
+	if (index > (Size-1))
+	{
 		cout << "error" << endl;
 		return;
 	}
 
-	Node<T>* delete_element = head;
-	head = head->next;
-	head->previos = nullptr;
-	delete delete_element;
-	Size--;
+	if (index == 0)
+	{
+		delete_first();
+		return;
+	}
+
+	int counter = 0;
+	Node<T>* current = head;
+
+	while(head) 
+	{
+		if (counter == index - 1) 
+		{ // значит нашли элемент, после которого нужно удалить элемент
+			Node<T>* delete_element = head->next;
+			head->next = head->next->next; // теперь next показывает через 1 элемент
+			
+			head->next->previos = head->next->previos->previos;
+			delete delete_element;
+			Size--;
+			head = current;
+			break;
+		}
+
+		counter++;
+		head = head->next;
+	}
 }
+
+template <class T> // удал€ет все элементы
+void List2<T>::delete_all()
+{ // пока не работает, не пон€тна ситуаци€ с концом списка при удалении
+	while (head)
+	{
+		delete_first();
+	}
+};
 
